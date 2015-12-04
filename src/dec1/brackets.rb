@@ -1,6 +1,6 @@
 @floor=0
 @basement_step=-1
-File.open('input.txt').each_char.with_index do |c, idx|
+File.open('data/dec1/input.txt').each_char.with_index do |c, idx|
   @floor+=1 if c == '('
   @floor-=1 if c == ')'
   if (@basement_step == -1 and @floor == -1)
