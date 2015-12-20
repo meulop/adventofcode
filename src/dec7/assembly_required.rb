@@ -44,4 +44,17 @@ def value(wire)
   end
 end
 
-pp value('a')
+part1_a = value('a')
+
+pp "Part 1: #{part1_a}"
+
+# Scrap cache
+$parents["b"] = [part1_a]
+$values = Hash.new do |h,k|
+  k.to_i
+end
+
+part2_a = value('a')
+pp "Part 2: #{part2_a}"
+
+
