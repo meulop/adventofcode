@@ -12,32 +12,26 @@ File.open('data/dec9/input.txt').each do |line|
   end
 end
 
+
 $locations = $graph.keys
 
-def tsp(vertset)
-  if $cache[vertset.sort]
-    $cache[vertset.sort]
-  else
-    case vertset.length
+def tsp(start,vertset)
+  vertset.sort!
+  $cache[start] ||= Hash.new
+  unless $cache[start][vertset]
+    $cache[start][vertset] = case vertset.length
     when 1
-      $cache[vertset.sort] = 0
-    when 2
-      $cache[vertset.sort] = $graph[vertset[0]][vertset[1]]
+      $graph[start][vertset[0]]
     else
-      $cache[vertset.sort] = vertset.map do |v1|
-        otherverts = vertset.reject{ |v| v==v1 }
-        otherverts .map do |v2|
-          $graph[v1][v2] + tsp(otherverts.reject{|v| v== v2})
-        end.min
+      vertset.map do |v|
+        $graph[start][v] + tsp(v,vertset.reject {|v2| v2==v})
       end.min
     end
   end
+  $cache[start][vertset]
 end
 
 
-pp tsp($graph.keys.sort)
-
-
-pp $cache
-
-pp tsp($graph.keys.sort)
+pp $locations.map { |s|
+  tsp(s,$locations.reject {|v| v==s})
+}.min
