@@ -29,6 +29,16 @@ end
 
 $people = $graph.keys
 
+# Part 2 section 
+$graph["Dave"] = Hash.new(0)
+$people.each do |p|
+  $graph[p]["Dave"] = 0
+  $graph["Dave"][p] = 0
+end
+
+$people << "Dave"
+
+# End Part 2 section
 
 def unrolled_happiness(perm)
   unless $cache[perm]
