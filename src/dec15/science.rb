@@ -3,6 +3,8 @@ require 'optparse'
 
 $props = ["capacity","durability","flavor","texture","calories"]
 $ings = []
+$ing_names = []
+
 
 class Ingredient
   $props.each do |p|
@@ -21,14 +23,29 @@ def ingredient_score(recipe)
     end.reduce(:+)
     score > 0 ? score : 0
   end
-  pp totscore
   totscore.include?(0) ? 0 : totscore.reduce(:*)
+end
+
+def combos(total,parts)
+  case parts
+  when 1
+    [total]
+  when 2
+    (1..total-1).map do |i|
+      [i,total -i]
+    end
+  else
+    (1..total-1).map do |i|
+      combos(total-i,parts-1).each do |a|
+        (a << i)
+      end
+    end.flatten(1)
+  end
 end
 
 OptionParser.new do |opts|
   $props.each do |a|
     opts.on("--[no-]#{a}","Include/exclude #{a} (default to include)") do |p|
-      pp p
       p || $props.delete(a)
     end
   end
@@ -38,11 +55,15 @@ File.open('data/dec15/input.txt').each do |line|
   line.chomp.match(/(?<name>[A-Za-z]+): (?<rest>.*)/) do |m1|
     i=Ingredient.new(m1[:name])
     m1[:rest].scan(/(?<prop>[a-z]+) (?<val>[-0-9]+)/) do |m2|
-      pp m2
       i.send(m2[0] + '=',m2[1].to_i) if $props.include?(m2[0])
     end
     $ings << i
+    $ing_names << i.name
   end
 end
 
-pp ingredient_score({"Sprinkles" => 1, "Butterscotch" => 1, "Chocolate" => 90, "Candy" => 8})
+a=combos(100,$ings.length).map do |combo|
+  ingredient_score(Hash[$ing_names.zip(combo)])
+end
+
+puts a.max
